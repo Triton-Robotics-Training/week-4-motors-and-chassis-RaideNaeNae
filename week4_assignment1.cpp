@@ -203,12 +203,44 @@ void remoteRead(bool debug = false){
 // Use prints and getData() for debugging purposes
 
 int main(){
-    
+    /*if(leftSwitch()==UP){
+        setPower(leftX()*20);
+    } else if(leftSwitch()==MID){
+        setPower(leftX()*5);
+    } else if(leftSwitch()==DOWN){
+        setPower(leftX()*10);
+    }*/
+    //DJImotor motor();
+    DJIMotor mainMotor(1, CANHandler::CANBUS_1, M3508, "Main Motor");
     //SETUP CODE HERE
 
     while(true){ //main loop
+         remote.read(); // Update remote data
 
-        //MAIN CODE HERE
+        // Get the left switch state
+        Remote::SwitchState switchState = remote.leftSwitch();
+        int leftX = remote.leftX(); // Get the left joystick X value
+
+        if (switchState == Remote::SwitchState::UP) {
+            mainMotor.setPower(20 * leftX);
+        } 
+        else if (switchState == Remote::SwitchState::MID) {
+            mainMotor.setSpeed(5 * leftX);
+        } 
+        else if (switchState == Remote::SwitchState::DOWN) {
+            mainMotor.setPosition(10 * leftX);
+        } 
+        else {
+            std::cout << "Unknown Switch State" << std::endl;
+        }
+
+        // Apply the changes to motorData
+        mainMotor.setOutput();
+
+        // Print debug values
+        std::cout << "Power: " << mainMotor.getData(POWER)
+                  << " | Speed: " << mainMotor.getData(VELOCITY)
+                  << " | Position: " << mainMotor.getData(ANGLE) << std::endl;
 
     }
 }
