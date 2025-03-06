@@ -51,11 +51,19 @@ int main(){
             //MOST CODE DOESNT NEED TO RUN FASTER THAN EVERY 25ms
             int x = remote.leftX();
             int y = remote.leftY();
+            int r = remote.rightX();
 
-            int tlSpeed = (y+x) * scaleFactor;
-            int trSpeed = (-y+x) * scaleFactor;
-            int blSpeed = (y-x) * scaleFactor;
-            int brSpeed = (-y-x) * scaleFactor;
+            if(x<50&&x>-50) {x=0;}
+            if(y<50&&y>-50) {y=0;}
+            if(r<50&&r>-50) {r=0;}
+
+            //printff("%d %d\n", x, y);
+
+            int tlSpeed = (y+x+r) * scaleFactor;
+            int trSpeed = (-y+x+r) * scaleFactor;
+            int blSpeed = (y-x+r) * scaleFactor;
+            int brSpeed = (-y-x+r) * scaleFactor;
+
             tl.setSpeed(tlSpeed);
             tr.setSpeed(trSpeed);
             bl.setSpeed(blSpeed);
