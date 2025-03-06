@@ -1,6 +1,3 @@
-//STARTER 
-//THIS EXERCISE IS TO BE DONE AND THEN RUN IN REAL LIFE ON A ROBOT
-//YOU WILL NOT BE ABLE TO COMPILE THIS UNLESS YOU SET UP THE BUILD ENVIRONMENT
 #include "main.h"
 
 DigitalOut led(L26);
@@ -10,6 +7,13 @@ DigitalOut led3(L25);
 I2C i2c(I2C_SDA, I2C_SCL);
 
 //DEFINE MOTORS, ETC
+int maxRPM = 9000;
+    int maxRemote = 660;
+    double scaleFactor = 9000/660;
+    DJIMotor tl(1, CANHandler::CANBUS_1, M3508, "top left motor");
+    DJIMotor tr(2, CANHandler::CANBUS_1, M3508, "top right motor");
+    DJIMotor bl(3, CANHandler::CANBUS_1, M3508, "bottom left motor");
+    DJIMotor br(4, CANHandler::CANBUS_1, M3508, "bottom right motor");
 
 int main(){
 
@@ -29,7 +33,7 @@ int main(){
 
     while(true){ //main loop
         timeStart_u = us_ticker_read();
-
+        
         //inner loop runs every 25ms
         if((timeStart_u - loopTimer_u) / 1000 > 25) { 
             loopTimer_u = timeStart_u;
@@ -44,15 +48,25 @@ int main(){
             remoteRead(); //reading data from remote
 
             //MAIN CODE 
-            //MOST CODE DOESNT NEED TO RUN FASTER THAN EVERY 25ms
+            //MOST CODE DOESNT NEED TO RUN FASTER THAN EVERY 25ms
+            int x = remote.leftX();
+            int y = remote.leftY();
+
+            int tlSpeed = (y+x) * scaleFactor;
+            int trSpeed = (-y+x) * scaleFactor;
+            int blSpeed = (y-x) * scaleFactor;
+            int brSpeed = (-y-x) * scaleFactor;
+            tl.setSpeed(tlSpeed);
+            tr.setSpeed(trSpeed);
+            bl.setSpeed(blSpeed);
+            br.setSpeed(brSpeed);
 
             timeEnd_u = us_ticker_read();
-
             DJIMotor::s_sendValues();
         }
 
-        //FEEDBACK CODE DOES NEED TO RUN FASTER THAN 1MS
-        //OTHER QUICK AND URGENT TASKS GO HERE
+        //FEEDBACK CODE DOES NEED TO RUN FASTER THAN 1MS
+        //OTHER QUICK AND URGENT TASKS GO HERE
 
         DJIMotor::s_getFeedback();
         ThisThread::sleep_for(1ms);
